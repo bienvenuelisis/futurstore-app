@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:futurstore/core/features/l10n/l10n.dart';
 import 'package:futurstore/core/utils/constants.dart';
 import 'package:futurstore/core/utils/extensions/navigator.dart';
 import 'package:futurstore/core/utils/extensions/theme_on_build_context.dart';
@@ -72,7 +73,9 @@ class BookCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text(
-                '${data.price} $kRelaiTokenSymbol',
+                data.price == 0
+                    ? context.l10n.freeAssetTitle
+                    : '${data.price} $kRelaiTokenSymbol',
                 style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

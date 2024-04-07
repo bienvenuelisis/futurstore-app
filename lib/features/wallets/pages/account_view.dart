@@ -239,6 +239,9 @@ class _AddWalletFormState extends ConsumerState<_AddWalletForm> with FormMixin {
                           );
 
                           if (result.success) {
+                            ref.read(connectedWalletProvider.notifier).value =
+                                result.data;
+
                             await widget.onSuccess?.call(result.data!);
 
                             loading = false;

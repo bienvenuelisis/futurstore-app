@@ -336,27 +336,31 @@ class _ReviewRatingBarState extends ConsumerState<_ReviewRatingBar> {
   void initState() {
     super.initState();
 
-    unawaited(
-      _hasThisAsset().then((value) {
-        setState(() {
-          _boughtThisAsset = value;
-        });
-
-        if (value) {
-          _haveAddedReview().then((value) {
-            setState(() {
-              _loadingReview = false;
-
-              _review = value;
-            });
+    Future.delayed(Duration.zero, () {
+      unawaited(
+        _hasThisAsset().then((value) {
+          setState(() {
+            _boughtThisAsset = value;
           });
-        }
 
-        setState(() {
-          _loadingReview = false;
-        });
-      }),
-    );
+          if (value) {
+            _haveAddedReview().then((value) {
+              setState(() {
+                _review = value;
+              });
+            });
+          }
+
+          setState(() {
+            _loadingReview = false;
+          });
+        }).catchError((e) {
+          setState(() {
+            _loadingReview = false;
+          });
+        }),
+      );
+    });
   }
 
   Future<void> _openReviewForm(double rating) async {

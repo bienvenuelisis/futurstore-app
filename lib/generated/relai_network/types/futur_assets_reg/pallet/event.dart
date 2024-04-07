@@ -81,6 +81,16 @@ class $Event {
   AssetUpdated assetUpdated({required int id}) {
     return AssetUpdated(id: id);
   }
+
+  ReviewSubmitted reviewSubmitted({
+    required _i3.AccountId32 reviewer,
+    required int id,
+  }) {
+    return ReviewSubmitted(
+      reviewer: reviewer,
+      id: id,
+    );
+  }
 }
 
 class $EventCodec with _i1.Codec<Event> {
@@ -102,6 +112,8 @@ class $EventCodec with _i1.Codec<Event> {
         return AssetBought._decode(input);
       case 5:
         return AssetUpdated._decode(input);
+      case 6:
+        return ReviewSubmitted._decode(input);
       default:
         throw Exception('Event: Invalid variant index: "$index"');
     }
@@ -131,6 +143,9 @@ class $EventCodec with _i1.Codec<Event> {
       case AssetUpdated:
         (value as AssetUpdated).encodeTo(output);
         break;
+      case ReviewSubmitted:
+        (value as ReviewSubmitted).encodeTo(output);
+        break;
       default:
         throw Exception(
             'Event: Unsupported "$value" of type "${value.runtimeType}"');
@@ -152,6 +167,8 @@ class $EventCodec with _i1.Codec<Event> {
         return (value as AssetBought)._sizeHint();
       case AssetUpdated:
         return (value as AssetUpdated)._sizeHint();
+      case ReviewSubmitted:
+        return (value as ReviewSubmitted)._sizeHint();
       default:
         throw Exception(
             'Event: Unsupported "$value" of type "${value.runtimeType}"');
@@ -521,4 +538,73 @@ class AssetUpdated extends Event {
 
   @override
   int get hashCode => id.hashCode;
+}
+
+class ReviewSubmitted extends Event {
+  const ReviewSubmitted({
+    required this.reviewer,
+    required this.id,
+  });
+
+  factory ReviewSubmitted._decode(_i1.Input input) {
+    return ReviewSubmitted(
+      reviewer: const _i1.U8ArrayCodec(32).decode(input),
+      id: _i1.U32Codec.codec.decode(input),
+    );
+  }
+
+  /// T::AccountId
+  final _i3.AccountId32 reviewer;
+
+  /// AssetId
+  final int id;
+
+  @override
+  Map<String, Map<String, dynamic>> toJson() => {
+        'ReviewSubmitted': {
+          'reviewer': reviewer.toList(),
+          'id': id,
+        }
+      };
+
+  int _sizeHint() {
+    int size = 1;
+    size = size + const _i3.AccountId32Codec().sizeHint(reviewer);
+    size = size + _i1.U32Codec.codec.sizeHint(id);
+    return size;
+  }
+
+  void encodeTo(_i1.Output output) {
+    _i1.U8Codec.codec.encodeTo(
+      6,
+      output,
+    );
+    const _i1.U8ArrayCodec(32).encodeTo(
+      reviewer,
+      output,
+    );
+    _i1.U32Codec.codec.encodeTo(
+      id,
+      output,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(
+        this,
+        other,
+      ) ||
+      other is ReviewSubmitted &&
+          _i4.listsEqual(
+            other.reviewer,
+            reviewer,
+          ) &&
+          other.id == id;
+
+  @override
+  int get hashCode => Object.hash(
+        reviewer,
+        id,
+      );
 }

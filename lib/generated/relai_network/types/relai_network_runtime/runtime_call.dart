@@ -4,10 +4,8 @@ import 'dart:typed_data' as _i2;
 import 'package:polkadart/scale_codec.dart' as _i1;
 
 import '../frame_system/pallet/call.dart' as _i3;
-import '../futur_assets_reg/pallet/call.dart' as _i11;
-import '../futur_creators_reg/pallet/call.dart' as _i10;
-import '../nft/pallet/call.dart' as _i9;
-import '../orml_nft/module/call.dart' as _i8;
+import '../futur_assets_reg/pallet/call.dart' as _i9;
+import '../futur_creators_reg/pallet/call.dart' as _i8;
 import '../pallet_balances/pallet/call.dart' as _i6;
 import '../pallet_grandpa/pallet/call.dart' as _i5;
 import '../pallet_sudo/pallet/call.dart' as _i7;
@@ -34,7 +32,7 @@ abstract class RuntimeCall {
     return codec.sizeHint(this);
   }
 
-  Map<String, dynamic> toJson();
+  Map<String, Map<String, dynamic>> toJson();
 }
 
 class $RuntimeCall {
@@ -60,19 +58,11 @@ class $RuntimeCall {
     return Sudo(value0);
   }
 
-  OrmlNFT ormlNFT(_i8.Call value0) {
-    return OrmlNFT(value0);
-  }
-
-  Nft nft(_i9.Call value0) {
-    return Nft(value0);
-  }
-
-  FuturCreatorsReg futurCreatorsReg(_i10.Call value0) {
+  FuturCreatorsReg futurCreatorsReg(_i8.Call value0) {
     return FuturCreatorsReg(value0);
   }
 
-  FuturAssetsReg futurAssetsReg(_i11.Call value0) {
+  FuturAssetsReg futurAssetsReg(_i9.Call value0) {
     return FuturAssetsReg(value0);
   }
 }
@@ -95,12 +85,8 @@ class $RuntimeCallCodec with _i1.Codec<RuntimeCall> {
       case 6:
         return Sudo._decode(input);
       case 7:
-        return OrmlNFT._decode(input);
-      case 8:
-        return Nft._decode(input);
-      case 9:
         return FuturCreatorsReg._decode(input);
-      case 10:
+      case 8:
         return FuturAssetsReg._decode(input);
       default:
         throw Exception('RuntimeCall: Invalid variant index: "$index"');
@@ -128,12 +114,6 @@ class $RuntimeCallCodec with _i1.Codec<RuntimeCall> {
       case Sudo:
         (value as Sudo).encodeTo(output);
         break;
-      case OrmlNFT:
-        (value as OrmlNFT).encodeTo(output);
-        break;
-      case Nft:
-        (value as Nft).encodeTo(output);
-        break;
       case FuturCreatorsReg:
         (value as FuturCreatorsReg).encodeTo(output);
         break;
@@ -159,10 +139,6 @@ class $RuntimeCallCodec with _i1.Codec<RuntimeCall> {
         return (value as Balances)._sizeHint();
       case Sudo:
         return (value as Sudo)._sizeHint();
-      case OrmlNFT:
-        return (value as OrmlNFT)._sizeHint();
-      case Nft:
-        return (value as Nft)._sizeHint();
       case FuturCreatorsReg:
         return (value as FuturCreatorsReg)._sizeHint();
       case FuturAssetsReg:
@@ -394,23 +370,24 @@ class Sudo extends RuntimeCall {
   int get hashCode => value0.hashCode;
 }
 
-class OrmlNFT extends RuntimeCall {
-  const OrmlNFT(this.value0);
+class FuturCreatorsReg extends RuntimeCall {
+  const FuturCreatorsReg(this.value0);
 
-  factory OrmlNFT._decode(_i1.Input input) {
-    return OrmlNFT(_i1.NullCodec.codec.decode(input));
+  factory FuturCreatorsReg._decode(_i1.Input input) {
+    return FuturCreatorsReg(_i8.Call.codec.decode(input));
   }
 
   /// self::sp_api_hidden_includes_construct_runtime::hidden_include::dispatch
-  ///::CallableCallFor<OrmlNFT, Runtime>
+  ///::CallableCallFor<FuturCreatorsReg, Runtime>
   final _i8.Call value0;
 
   @override
-  Map<String, dynamic> toJson() => {'OrmlNFT': null};
+  Map<String, Map<String, dynamic>> toJson() =>
+      {'FuturCreatorsReg': value0.toJson()};
 
   int _sizeHint() {
     int size = 1;
-    size = size + const _i8.CallCodec().sizeHint(value0);
+    size = size + _i8.Call.codec.sizeHint(value0);
     return size;
   }
 
@@ -419,94 +396,7 @@ class OrmlNFT extends RuntimeCall {
       7,
       output,
     );
-    _i1.NullCodec.codec.encodeTo(
-      value0,
-      output,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(
-        this,
-        other,
-      ) ||
-      other is OrmlNFT && other.value0 == value0;
-
-  @override
-  int get hashCode => value0.hashCode;
-}
-
-class Nft extends RuntimeCall {
-  const Nft(this.value0);
-
-  factory Nft._decode(_i1.Input input) {
-    return Nft(_i9.Call.codec.decode(input));
-  }
-
-  /// self::sp_api_hidden_includes_construct_runtime::hidden_include::dispatch
-  ///::CallableCallFor<NFT, Runtime>
-  final _i9.Call value0;
-
-  @override
-  Map<String, String> toJson() => {'NFT': value0.toJson()};
-
-  int _sizeHint() {
-    int size = 1;
-    size = size + _i9.Call.codec.sizeHint(value0);
-    return size;
-  }
-
-  void encodeTo(_i1.Output output) {
-    _i1.U8Codec.codec.encodeTo(
-      8,
-      output,
-    );
-    _i9.Call.codec.encodeTo(
-      value0,
-      output,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(
-        this,
-        other,
-      ) ||
-      other is Nft && other.value0 == value0;
-
-  @override
-  int get hashCode => value0.hashCode;
-}
-
-class FuturCreatorsReg extends RuntimeCall {
-  const FuturCreatorsReg(this.value0);
-
-  factory FuturCreatorsReg._decode(_i1.Input input) {
-    return FuturCreatorsReg(_i10.Call.codec.decode(input));
-  }
-
-  /// self::sp_api_hidden_includes_construct_runtime::hidden_include::dispatch
-  ///::CallableCallFor<FuturCreatorsReg, Runtime>
-  final _i10.Call value0;
-
-  @override
-  Map<String, Map<String, dynamic>> toJson() =>
-      {'FuturCreatorsReg': value0.toJson()};
-
-  int _sizeHint() {
-    int size = 1;
-    size = size + _i10.Call.codec.sizeHint(value0);
-    return size;
-  }
-
-  void encodeTo(_i1.Output output) {
-    _i1.U8Codec.codec.encodeTo(
-      9,
-      output,
-    );
-    _i10.Call.codec.encodeTo(
+    _i8.Call.codec.encodeTo(
       value0,
       output,
     );
@@ -528,12 +418,12 @@ class FuturAssetsReg extends RuntimeCall {
   const FuturAssetsReg(this.value0);
 
   factory FuturAssetsReg._decode(_i1.Input input) {
-    return FuturAssetsReg(_i11.Call.codec.decode(input));
+    return FuturAssetsReg(_i9.Call.codec.decode(input));
   }
 
   /// self::sp_api_hidden_includes_construct_runtime::hidden_include::dispatch
   ///::CallableCallFor<FuturAssetsReg, Runtime>
-  final _i11.Call value0;
+  final _i9.Call value0;
 
   @override
   Map<String, Map<String, Map<String, dynamic>>> toJson() =>
@@ -541,16 +431,16 @@ class FuturAssetsReg extends RuntimeCall {
 
   int _sizeHint() {
     int size = 1;
-    size = size + _i11.Call.codec.sizeHint(value0);
+    size = size + _i9.Call.codec.sizeHint(value0);
     return size;
   }
 
   void encodeTo(_i1.Output output) {
     _i1.U8Codec.codec.encodeTo(
-      10,
+      8,
       output,
     );
-    _i11.Call.codec.encodeTo(
+    _i9.Call.codec.encodeTo(
       value0,
       output,
     );

@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -140,7 +142,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
               Center(
                 child: SizedBox(
                   width: context.width * 0.9,
-                  height: AppSpacing.xxlg,
+                  // height: AppSpacing.xxlg,
                   child: GetBookButton(
                     data: widget.data,
                   ),
@@ -316,7 +318,7 @@ class _ReviewRatingBarState extends ConsumerState<_ReviewRatingBar> {
   void initState() {
     super.initState();
 
-    unawaited(
+    Future.delayed(const Duration(seconds: 1), () {
       _hasThisAsset().then((value) {
         setState(() {
           _boughtThisAsset = value;
@@ -325,8 +327,6 @@ class _ReviewRatingBarState extends ConsumerState<_ReviewRatingBar> {
         if (value) {
           _haveAddedReview().then((value) {
             setState(() {
-              _loadingReview = false;
-
               _review = value;
             });
           });
@@ -335,8 +335,12 @@ class _ReviewRatingBarState extends ConsumerState<_ReviewRatingBar> {
         setState(() {
           _loadingReview = false;
         });
-      }),
-    );
+      }).catchError((e) {
+        setState(() {
+          _loadingReview = false;
+        });
+      });
+    });
   }
 
   Future<void> _openReviewForm(double rating) async {

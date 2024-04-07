@@ -46,6 +46,15 @@ class Queries {
     hasher2: _i1.StorageHasher.blake2b128Concat(_i2.U32Codec.codec),
   );
 
+  final _i1.StorageDoubleMap<_i4.AccountId32, int, List<int>> _reviews =
+      const _i1.StorageDoubleMap<_i4.AccountId32, int, List<int>>(
+    prefix: 'FuturAssetsReg',
+    storage: 'Reviews',
+    valueCodec: _i2.U8ArrayCodec(32),
+    hasher1: _i1.StorageHasher.blake2b128Concat(_i4.AccountId32Codec()),
+    hasher2: _i1.StorageHasher.blake2b128Concat(_i2.U32Codec.codec),
+  );
+
   _i5.Future<int> nextAssetId({_i1.BlockHash? at}) async {
     final hashedKey = _nextAssetId.hashedKey();
     final bytes = await __api.getStorage(
@@ -107,6 +116,25 @@ class Queries {
     return null; /* Nullable */
   }
 
+  _i5.Future<List<int>?> reviews(
+    _i4.AccountId32 key1,
+    int key2, {
+    _i1.BlockHash? at,
+  }) async {
+    final hashedKey = _reviews.hashedKeyFor(
+      key1,
+      key2,
+    );
+    final bytes = await __api.getStorage(
+      hashedKey,
+      at: at,
+    );
+    if (bytes != null) {
+      return _reviews.decodeValue(bytes);
+    }
+    return null; /* Nullable */
+  }
+
   /// Returns the storage key for `nextAssetId`.
   _i6.Uint8List nextAssetIdKey() {
     final hashedKey = _nextAssetId.hashedKey();
@@ -137,6 +165,18 @@ class Queries {
     return hashedKey;
   }
 
+  /// Returns the storage key for `reviews`.
+  _i6.Uint8List reviewsKey(
+    _i4.AccountId32 key1,
+    int key2,
+  ) {
+    final hashedKey = _reviews.hashedKeyFor(
+      key1,
+      key2,
+    );
+    return hashedKey;
+  }
+
   /// Returns the storage map key prefix for `assetRegistry`.
   _i6.Uint8List assetRegistryMapPrefix() {
     final hashedKey = _assetRegistry.mapPrefix();
@@ -152,6 +192,12 @@ class Queries {
   /// Returns the storage map key prefix for `assetPurchases`.
   _i6.Uint8List assetPurchasesMapPrefix(_i4.AccountId32 key1) {
     final hashedKey = _assetPurchases.mapPrefix(key1);
+    return hashedKey;
+  }
+
+  /// Returns the storage map key prefix for `reviews`.
+  _i6.Uint8List reviewsMapPrefix(_i4.AccountId32 key1) {
+    final hashedKey = _reviews.mapPrefix(key1);
     return hashedKey;
   }
 }

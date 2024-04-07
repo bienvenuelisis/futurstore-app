@@ -8,7 +8,9 @@ import 'package:futurstore/core/features/l10n/l10n.dart';
 import 'package:futurstore/core/presentation/theming/configs/app_spacing.dart';
 import 'package:futurstore/core/utils/constants.dart';
 import 'package:futurstore/core/utils/extensions/build_context.dart';
+import 'package:futurstore/core/utils/extensions/navigator.dart';
 import 'package:futurstore/core/utils/extensions/theme_on_build_context.dart';
+import 'package:futurstore/core/utils/mixins/form_mixin.dart';
 import 'package:futurstore/features/apps/data/models/app.dart';
 import 'package:futurstore/features/packages/data/models/index.dart';
 import 'package:futurstore/features/packages/providers/get_package_installed_info_func_provider.dart';
@@ -17,6 +19,8 @@ import 'package:futurstore/features/packages/providers/is_package_file_downloade
 import 'package:futurstore/features/packages/providers/is_package_installed_func_provider.dart';
 import 'package:futurstore/features/packages/providers/package_file_installer_provider.dart';
 import 'package:futurstore/features/packages/providers/start_package_installed_func_provider.dart';
+import 'package:futurstore/features/wallets/controllers/providers/connected_wallet_provider.dart';
+import 'package:futurstore/features/wallets/pages/account_page.dart';
 
 import '../../wallets/controllers/services/assets.dart';
 
@@ -29,7 +33,8 @@ class InstallGameButton extends ConsumerStatefulWidget {
   ConsumerState<InstallGameButton> createState() => _InstallGameButtonState();
 }
 
-class _InstallGameButtonState extends ConsumerState<InstallGameButton> {
+class _InstallGameButtonState extends ConsumerState<InstallGameButton>
+    with FormMixin {
   bool _started = false;
   bool _buyingAsset = false;
 
@@ -87,6 +92,7 @@ class _InstallGameButtonState extends ConsumerState<InstallGameButton> {
       );
     } catch (e) {
       debugPrint(e.toString());
+      error = e.toString();
 
       setState(() {
         _buyingAsset = false;
@@ -235,95 +241,123 @@ class _InstallGameButtonState extends ConsumerState<InstallGameButton> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
+    final connectedWallet = ref.watch(connectedWalletProvider);
+
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            if (_started || installing)
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: _started ? context.width * 0.4 : 0,
-                child: ElevatedButton(
-                  onPressed: installing ? null : () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        context.colorScheme.secondary.withOpacity(0.6),
-                  ),
-                  child: Text(
-                    l10n.cancelInstallation,
-                  ),
-                ),
-              ),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: _started ? context.width * 0.4 : context.width * 0.9,
-              child: _started || downloaded
-                  ? ElevatedButton(
-                      onPressed: downloaded
-                          ? () async {
-                              if (!await _isPackageFileDownloaded()) {
-                                await _start();
-                                return;
-                              }
-
-                              if (!await _isPackageInstalled()) {
-                                await _installDownloadedApp();
-                              }
-
-                              await _openInstalledApp();
-                            }
-                          : null,
-                      child: Text(
-                        l10n.openApp,
-                      ),
-                    )
-                  : SizedBox(
-                      width: context.width * 0.9,
-                      height: AppSpacing.xxlg,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              await _buyAsset();
-                            },
-                            child: Text(
-                              _packageInstalledInfo == null
-                                  ? (widget.data.price <= 0 || _boughtThisAsset
-                                      ? l10n.installApp
-                                      : '''${l10n.getApp} (${widget.data.price}$kRelaiTokenSymbol)''')
-                                  : l10n.updateApp,
-                            ),
-                          ),
-                          if (_buyingAsset)
-                            const Positioned.fill(
-                              child: Center(
-                                child: CircularProgressIndicator.adaptive(),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+        if (connectedWallet.value == null)
+          ElevatedButton(
+            onPressed: () async {
+              await context.pushTo(const AccountPage());
+            },
+            child: Text(
+              l10n.connectToWalletBtnTex,
             ),
-          ],
-        ),
-        if (downloading)
+          )
+        else
           Column(
             children: [
-              const SizedBox(height: 8),
-              LinearProgressIndicator(
-                minHeight: 3,
-                value: _downloadProgress,
-                valueColor: AlwaysStoppedAnimation(
-                  context.colorScheme.primary,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (_started || installing)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: _started ? context.width * 0.4 : 0,
+                      child: ElevatedButton(
+                        onPressed: installing ? null : () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              context.colorScheme.secondary.withOpacity(0.6),
+                        ),
+                        child: Text(
+                          l10n.cancelInstallation,
+                        ),
+                      ),
+                    ),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: _started ? context.width * 0.4 : context.width * 0.9,
+                    child: _started || downloaded
+                        ? ElevatedButton(
+                            onPressed: downloaded
+                                ? () async {
+                                    if (!await _isPackageFileDownloaded()) {
+                                      await _start();
+                                      return;
+                                    }
+
+                                    if (!await _isPackageInstalled()) {
+                                      await _installDownloadedApp();
+                                    }
+
+                                    await _openInstalledApp();
+                                  }
+                                : null,
+                            child: Text(
+                              l10n.openApp,
+                            ),
+                          )
+                        : SizedBox(
+                            width: context.width * 0.9,
+                            height: AppSpacing.xxlg,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    await _buyAsset();
+                                  },
+                                  child: Text(
+                                    _packageInstalledInfo == null
+                                        ? (widget.data.price <= 0 ||
+                                                _boughtThisAsset
+                                            ? l10n.installApp
+                                            : '''${l10n.getApp} (${widget.data.price}$kRelaiTokenSymbol)''')
+                                        : l10n.updateApp,
+                                  ),
+                                ),
+                                if (_buyingAsset)
+                                  const Positioned.fill(
+                                    child: Center(
+                                      child:
+                                          CircularProgressIndicator.adaptive(),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                  ),
+                ],
+              ),
+              if (downloading)
+                Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(
+                      minHeight: 3,
+                      value: _downloadProgress,
+                      valueColor: AlwaysStoppedAnimation(
+                        context.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '''${l10n.downloadingPackage}... ${(_downloadProgress * 100).toStringAsFixed(0)}%''',
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '''${l10n.downloadingPackage}... ${(_downloadProgress * 100).toStringAsFixed(0)}%''',
-              ),
             ],
+          ),
+        if (hasError)
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text(
+              errorMessage,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colorScheme.error,
+              ),
+            ),
           ),
       ],
     );

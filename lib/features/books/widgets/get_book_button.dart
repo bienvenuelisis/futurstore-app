@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:futurstore/core/features/l10n/l10n.dart';
 import 'package:futurstore/core/utils/constants.dart';
+import 'package:futurstore/core/utils/extensions/navigator.dart';
+import 'package:futurstore/core/utils/extensions/theme_on_build_context.dart';
+import 'package:futurstore/core/utils/mixins/form_mixin.dart';
 import 'package:futurstore/features/packages/providers/file_downloader_func_provider.dart';
 import 'package:futurstore/features/packages/providers/is_file_downloaded_provider.dart';
 import 'package:futurstore/features/packages/providers/open_downloaded_file_func_provider.dart';
+import 'package:futurstore/features/wallets/controllers/providers/connected_wallet_provider.dart';
+import 'package:futurstore/features/wallets/pages/account_page.dart';
 
 import '../../packages/data/models/index.dart';
 import '../../wallets/controllers/services/assets.dart';
@@ -24,7 +29,7 @@ class GetBookButton extends ConsumerStatefulWidget {
   ConsumerState<GetBookButton> createState() => _GetBookButtonState();
 }
 
-class _GetBookButtonState extends ConsumerState<GetBookButton> {
+class _GetBookButtonState extends ConsumerState<GetBookButton> with FormMixin {
   bool _boughtThisAsset = false;
   bool _buyingAsset = false;
   double _downloadProgress = 0;
@@ -81,6 +86,7 @@ class _GetBookButtonState extends ConsumerState<GetBookButton> {
       );
     } catch (e) {
       debugPrint(e.toString());
+      error = e.toString();
 
       setState(() {
         _buyingAsset = false;
@@ -178,34 +184,62 @@ class _GetBookButtonState extends ConsumerState<GetBookButton> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return downloaded
-        ? ElevatedButton(
-            onPressed: _openDownloadedFile,
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+    final connectedWallet = ref.watch(connectedWalletProvider);
+
+    return Column(
+      children: [
+        if (connectedWallet.value == null)
+          ElevatedButton(
+            onPressed: () async {
+              await context.pushTo(const AccountPage());
+            },
+            child: Text(
+              l10n.connectToWalletBtnTex,
             ),
-            child: const Text('Open'),
           )
-        : downloading
-            ? const Center(child: CircularProgressIndicator.adaptive())
-            : ElevatedButton(
-                onPressed: _buyAsset,
-                style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(Colors.green),
-                  foregroundColor:
-                      MaterialStateProperty.all<Color>(Colors.white),
-                ),
-                child: _buyingAsset
-                    ? Text('${l10n.buyingAsset}...')
-                    : _started
-                        ? Text('${l10n.gettingBook}...')
-                        : Text(
-                            widget.data.price <= 0 || _boughtThisAsset
-                                ? l10n.getBook
-                                : '''${l10n.getBook} (${widget.data.price}$kRelaiTokenSymbol)''',
-                          ),
-              );
+        else
+          downloaded
+              ? ElevatedButton(
+                  onPressed: _openDownloadedFile,
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.green),
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                  ),
+                  child: const Text('Open'),
+                )
+              : downloading
+                  ? const Center(child: CircularProgressIndicator.adaptive())
+                  : ElevatedButton(
+                      onPressed: _buyAsset,
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.green),
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                      ),
+                      child: _buyingAsset
+                          ? Text('${l10n.buyingAsset}...')
+                          : _started
+                              ? Text('${l10n.gettingBook}...')
+                              : Text(
+                                  widget.data.price <= 0 || _boughtThisAsset
+                                      ? l10n.getBook
+                                      : '''${l10n.getBook} (${widget.data.price}$kRelaiTokenSymbol)''',
+                                ),
+                    ),
+        if (hasError)
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text(
+              errorMessage,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colorScheme.error,
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }
