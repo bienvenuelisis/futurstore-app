@@ -201,11 +201,9 @@ class _GetBookButtonState extends ConsumerState<GetBookButton> with FormMixin {
           downloaded
               ? ElevatedButton(
                   onPressed: _openDownloadedFile,
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.green),
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
                   ),
                   child: const Text('Open'),
                 )
@@ -213,11 +211,9 @@ class _GetBookButtonState extends ConsumerState<GetBookButton> with FormMixin {
                   ? const Center(child: CircularProgressIndicator.adaptive())
                   : ElevatedButton(
                       onPressed: _buyAsset,
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.green),
-                        foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
                       ),
                       child: _buyingAsset
                           ? Text('${l10n.buyingAsset}...')

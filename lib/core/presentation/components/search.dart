@@ -112,7 +112,7 @@ Future<void> _openAccountDialogBox(BuildContext context) {
                       IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () {
-                          context.pop(null);
+                          context.pop();
                         },
                       ),
                     ],
@@ -151,7 +151,7 @@ Future<void> _openAccountDialogBox(BuildContext context) {
                   const Divider(thickness: 1),
                   ListTile(
                     onTap: () async {
-                      context.pop(null);
+                      context.pop();
 
                       await context.pushTo(const AccountPage());
                     },
